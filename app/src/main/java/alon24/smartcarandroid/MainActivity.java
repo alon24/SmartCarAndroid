@@ -16,11 +16,16 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.SubMenu;
 import android.view.View;
+import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import org.java_websocket.client.WebSocketClient;
@@ -31,13 +36,25 @@ import java.net.URISyntaxException;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, CompoundButton.OnCheckedChangeListener, TextWatcher {
 
+    private static String TAG = "SmartCar";
     private WebSocketClient mWebSocketClient;
     WifiManager wifi;
+    String wifis[];
 
     int size = 0;
     List<ScanResult> results;
+
+    WifiScanReceiver wifiReciever;
+    String smartCarIp = "10.100.102.152";
+
+    private Switch connectModeSwitch;
+    private Button connectBtn;
+    private EditText carIpText;
+
+    private boolean isConnected = false;
+    private boolean isConnecting = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,41 +81,71 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        Menu m = navigationView.getMenu();
-        SubMenu topChannelMenu = m.addSubMenu("Top Channels");
-        topChannelMenu.add("Foo");
-        topChannelMenu.add("Bar");
-        topChannelMenu.add("Baz");
+        connectModeSwitch = (Switch) findViewById(R.id.connectModeSwitch);
+        connectBtn = (Button)findViewById(R.id.connectStateBtn);
+        carIpText = (EditText)findViewById(R.id.carIpText);
 
-        MenuItem mi = m.getItem(m.size()-1);
-        mi.setTitle("testing123");
-        mi.setTitle(mi.getTitle());
+        carIpText.setText(smartCarIp);
+        connectBtn.setOnClickListener(this);
+        connectModeSwitch.setOnCheckedChangeListener(this);
+//        carIpText.addTextChangedListener((this);
+        ((Button)findViewById(R.id.upBtn)).setOnClickListener(this);
+        ((Button)findViewById(R.id.downBtn)).setOnClickListener(this);
+        ((Button)findViewById(R.id.leftBtn)).setOnClickListener(this);
+        ((Button)findViewById(R.id.rightBtn)).setOnClickListener(this);
+
+
+
+//        Menu m = navigationView.getMenu();
+//        SubMenu wifiConnectionsMenu = m.addSubMenu("WifiConnections");
+//        wifiConnectionsMenu.add("Foo");
+//        wifiConnectionsMenu.add("Bar");
+//        wifiConnectionsMenu.add("Baz");
+//
+//        MenuItem mi = m.getItem(m.size()-1);
+//        mi.setTitle("testing123");
+//        mi.setTitle(mi.getTitle());
+
+//        ConnectivityManager connManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+//        NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+//        NetworkInfo mEthernet = connManager.getNetworkInfo(ConnectivityManager.TYPE_ETHERNET);
+//        NetworkInfo m3G = connManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+//        if (mWifi!=null) isOnWifi = mWifi.isConnected();
+//        if (mEthernet!=null) isOnEthernet = mEthernet.isConnected();
+//        if (m3G!=null) is3G = m3G.isConnected();
 
         wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        wifiReciever = new WifiScanReceiver();
         if (wifi.isWifiEnabled() == false)
         {
             Toast.makeText(getApplicationContext(), "wifi is disabled..making it enabled", Toast.LENGTH_LONG).show();
             wifi.setWifiEnabled(true);
         }
 
-        registerReceiver(new BroadcastReceiver()
-        {
-            @Override
-            public void onReceive(Context c, Intent intent)
-            {
-               results = wifi.getScanResults();
-               size = results.size();
-            }
-        }, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
-
-                connectWebSocket();
+//        registerReceiver(new BroadcastReceiver()
+//        {
+//            @Override
+//            public void onReceive(Context c, Intent intent)
+//            {
+//               results = wifi.getScanResults();
+//               size = results.size();
+////                wifi.conn
+//            }
+//        }, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+//
+//        if (wifi.isWifiEnabled()) {
+//            wifi.startScan();
+//        }
+//        connectWebSocket();
 
     }
 
     private void connectWebSocket() {
         URI uri;
         try {
-            uri = new URI("ws://websockethost:8080");
+            uri = new URI("ws://10.100.102.152:80/index.html?command=true");
+//            uri = new URI("ws://echo.websocket.org");
+
         } catch (URISyntaxException e) {
             e.printStackTrace();
             return;
@@ -130,16 +177,35 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onError(Exception e) {
+                isConnected = false;
+                updateScreenState();
                 Log.i("Websocket", "Error " + e.getMessage());
             }
         };
         mWebSocketClient.connect();
     }
 
-    public void sendMessage(View view) {
-//        EditText editText = (EditText)findViewById(R.id.message);
-//        mWebSocketClient.send(editText.getText().toString());
-//        editText.setText("");
+    private void updateScreenState() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (isConnecting) {
+                    connectBtn.setText("מתחבר!");
+                    connectBtn.setEnabled(true);
+                } else if (isConnected) {
+                    connectBtn.setText("מחובר!");
+                    connectBtn.setEnabled(true);
+                } else {
+                    connectBtn.setText("לא מחובר!");
+                    connectBtn.setEnabled(false);
+                }
+            }
+        });
+    }
+
+
+    private void sendMessage(String msg) {
+        mWebSocketClient.send(msg);
     }
 
     @Override
@@ -150,6 +216,28 @@ public class MainActivity extends AppCompatActivity
         } else {
             super.onBackPressed();
         }
+    }
+
+    protected void onPause() {
+        unregisterReceiver(wifiReciever);
+        super.onPause();
+    }
+
+
+    protected void onResume() {
+
+//        if (wifi.isWifiEnabled() == false)
+//        {
+//            Toast.makeText(getApplicationContext(), "wifi is disabled..making it enabled", Toast.LENGTH_LONG).show();
+//            wifi.setWifiEnabled(true);
+//        }
+//
+        registerReceiver(wifiReciever, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+//
+//        if (wifi.isWifiEnabled()) {
+//            wifi.startScan();
+//        }
+        super.onResume();
     }
 
     @Override
@@ -180,9 +268,12 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_configNetwork) {
+        if (id == R.id.nav_settings) {
             // Handle the camera action
-        } else if (id == R.id.nav_locateCar) {
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
+        } else if (id == R.id.nav_conenctToCar) {
+            connectWebSocket();
 //
 //        } else if (id == R.id.nav_slideshow) {
 //
@@ -197,5 +288,79 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        if (isChecked) {
+            connectBtn.setEnabled(true);
+
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.connectStateBtn:
+                if (isConnected) {
+                    connectBtn.setText("לא מחובר");
+                    isConnecting = false;
+                    isConnected = false;
+                } else {
+                    connectBtn.setText("מתחבר!");
+                    connectWebSocket();
+                    isConnecting = true;
+                }
+                break;
+            case R.id.upBtn:
+                sendMessage("move forward");
+                break;
+            case R.id.downBtn:
+                sendMessage("move back");
+                break;
+            case R.id.leftBtn:
+                sendMessage("move left");
+                break;
+            case R.id.rightBtn:
+                sendMessage("move right");
+                break;
+            case R.id.stopBtn:
+                sendMessage("move stop");
+                break;
+        }
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+    Log.d(TAG, carIpText.getText().toString());
+    }
+
+    private class WifiScanReceiver extends BroadcastReceiver{
+        public void onReceive(Context c, Intent intent) {
+            List<ScanResult> wifiScanList = wifi.getScanResults();
+            wifis = new String[wifiScanList.size()];
+
+            for(int i = 0; i < wifiScanList.size(); i++){
+
+//                item = wifiScanList.get(i);
+                wifis[i] = ((wifiScanList.get(i)).toString());
+                Log.d(TAG, "SSID " + wifis[i]);
+//                if (wifis[i].equals(WIFI_SSID)) {
+//                    Log.d(TAG, "SSID " + wifis[i]);
+////                    WifiManager.
+//                }
+            }
+//            lv.setAdapter(new ArrayAdapter<String>(getApplicationContext(),android.R.layout.simple_list_item_1,wifis));
+        }
     }
 }

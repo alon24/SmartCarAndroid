@@ -14,10 +14,10 @@
 
     <item android:title="Configure">
         <menu>
-            <item android:id="@+id/nav_configNetwork" android:icon="@android:drawable/ic_menu_share"
-                android:title="Define Network" />
-            <item android:id="@+id/nav_locateCar" android:icon="@android:drawable/ic_menu_send"
-                android:title="Locate Car" />
+            <item android:id="@+id/nav_settings" android:icon="@android:drawable/ic_menu_share"
+                android:title="Settings" />
+            <item android:id="@+id/nav_conenctToCar" android:icon="@android:drawable/ic_menu_send"
+                android:title="Connect to car" />
         </menu>
     </item>
 
