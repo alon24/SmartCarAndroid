@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -28,18 +27,17 @@ import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.Toast;
 
-import org.java_websocket.client.WebSocketClient;
-import org.java_websocket.handshake.ServerHandshake;
-
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
+
+import de.tavendo.autobahn.WebSocketConnection;
+import de.tavendo.autobahn.WebSocketException;
+import de.tavendo.autobahn.WebSocketHandler;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, CompoundButton.OnCheckedChangeListener, TextWatcher {
 
     private static String TAG = "SmartCar";
-    private WebSocketClient mWebSocketClient;
+//    private WebSocketClient mWebSocketClient;
     WifiManager wifi;
     String wifis[];
 
@@ -47,7 +45,7 @@ public class MainActivity extends AppCompatActivity
     List<ScanResult> results;
 
     WifiScanReceiver wifiReciever;
-    String smartCarIp = "10.100.102.152";
+    String smartCarIp = "10.100.102.149";
 
     private Switch connectModeSwitch;
     private Button connectBtn;
@@ -140,50 +138,85 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    private void connectWebSocket() {
-        URI uri;
+    private final WebSocketConnection mConnection = new WebSocketConnection();
+
+    private void start() {
+
+        final String wsuri = "ws://10.100.102.149:80/index.html?command=true";
+//        final String wsuri = "ws://192.168.1.132:9000";
+
+
         try {
-            uri = new URI("ws://10.100.102.152:80/index.html?command=true");
-//            uri = new URI("ws://echo.websocket.org");
+            mConnection.connect(wsuri, new WebSocketHandler() {
 
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-            return;
+                @Override
+                public void onOpen() {
+                    Log.d(TAG, "Status: Connected to " + wsuri);
+                    mConnection.sendTextMessage("Hello, world!");
+                }
+
+                @Override
+                public void onTextMessage(String payload) {
+                    Log.d(TAG, "Got echo: " + payload);
+                }
+
+                @Override
+                public void onClose(int code, String reason) {
+                    Log.d(TAG, "Connection lost.");
+                }
+            });
+        } catch (WebSocketException e) {
+
+            Log.d(TAG, e.toString());
         }
-
-        mWebSocketClient = new WebSocketClient(uri) {
-            @Override
-            public void onOpen(ServerHandshake serverHandshake) {
-                Log.i("Websocket", "Opened");
-                mWebSocketClient.send("Hello from " + Build.MANUFACTURER + " " + Build.MODEL);
-            }
-
-            @Override
-            public void onMessage(String s) {
-//                final String message = s;
-//                runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        TextView textView = (TextView)findViewById(R.id.messages);
-//                        textView.setText(textView.getText() + "\n" + message);
-//                    }
-//                });
-            }
-
-            @Override
-            public void onClose(int i, String s, boolean b) {
-                Log.i("Websocket", "Closed " + s);
-            }
-
-            @Override
-            public void onError(Exception e) {
-                isConnected = false;
-                updateScreenState();
-                Log.i("Websocket", "Error " + e.getMessage());
-            }
-        };
-        mWebSocketClient.connect();
     }
+
+//    private void connectWebSocket() {
+//        URI uri;
+//        try {
+////            uri = new URI("ws://10.100.102.149:8080/index.html?command=true");
+//            uri = new URI("ws://10.100.102.149:8080");
+////            uri = new URI("ws://echo.websocket.org");
+//
+//        } catch (URISyntaxException e) {
+//            e.printStackTrace();
+//            return;
+//        }
+//
+//        mWebSocketClient = new WebSocketClient(uri) {
+//            @Override
+//            public void onOpen(ServerHandshake serverHandshake) {
+//                Log.i("Websocket", "Opened");
+//                mWebSocketClient.send("Hello from " + Build.MANUFACTURER + " " + Build.MODEL);
+//            }
+//
+//            @Override
+//            public void onMessage(String s) {
+////                final String message = s;
+////                runOnUiThread(new Runnable() {
+////                    @Override
+////                    public void run() {
+////                        TextView textView = (TextView)findViewById(R.id.messages);
+////                        textView.setText(textView.getText() + "\n" + message);
+////                    }
+////                });
+//            }
+//
+//            @Override
+//            public void onClose(int i, String s, boolean b) {
+//                Log.i("Websocket", "Closed " + s);
+//            }
+//
+//            @Override
+//            public void onError(Exception e) {
+//                isConnected = false;
+//                updateScreenState();
+//                Log.i("Websocket", "Error " + e.getMessage());
+//            }
+//        };
+//        WebSocketImpl.DEBUG = true;
+//        mWebSocketClient.connect();
+//    }
 
     private void updateScreenState() {
         runOnUiThread(new Runnable() {
@@ -205,7 +238,8 @@ public class MainActivity extends AppCompatActivity
 
 
     private void sendMessage(String msg) {
-        mWebSocketClient.send(msg);
+        mConnection.sendTextMessage(msg);
+//        mWebSocketClient.send(msg);
     }
 
     @Override
@@ -273,7 +307,8 @@ public class MainActivity extends AppCompatActivity
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_conenctToCar) {
-            connectWebSocket();
+            start();
+//            connectWebSocket();
 //
 //        } else if (id == R.id.nav_slideshow) {
 //
@@ -308,24 +343,25 @@ public class MainActivity extends AppCompatActivity
                     isConnected = false;
                 } else {
                     connectBtn.setText("מתחבר!");
-                    connectWebSocket();
+                    start();
+//                    connectWebSocket();
                     isConnecting = true;
                 }
                 break;
             case R.id.upBtn:
-                sendMessage("move forward");
+                sendMessage("Move forward");
                 break;
             case R.id.downBtn:
-                sendMessage("move back");
+                sendMessage("Move back");
                 break;
             case R.id.leftBtn:
-                sendMessage("move left");
+                sendMessage("Move left");
                 break;
             case R.id.rightBtn:
-                sendMessage("move right");
+                sendMessage("Move right");
                 break;
             case R.id.stopBtn:
-                sendMessage("move stop");
+                sendMessage("Move stop");
                 break;
         }
     }
