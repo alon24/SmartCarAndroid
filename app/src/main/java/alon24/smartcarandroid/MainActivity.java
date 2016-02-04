@@ -4,7 +4,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.net.wifi.ScanResult;
+import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -45,7 +47,9 @@ public class MainActivity extends AppCompatActivity
     List<ScanResult> results;
 
     WifiScanReceiver wifiReciever;
-    String smartCarIp = "10.100.102.149";
+//    String smartCarIp = "192.168.4.1";
+    SharedPreferences sharedPref;
+    String AP_SSID = "SmartCar";
 
     private Switch connectModeSwitch;
     private Button connectBtn;
@@ -58,6 +62,9 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
+
+        sharedPref = getPreferences(Context.MODE_PRIVATE);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -65,7 +72,7 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                Snackbar.make(view, "מצא מכונית והתחבר", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
         });
@@ -82,17 +89,37 @@ public class MainActivity extends AppCompatActivity
         connectModeSwitch = (Switch) findViewById(R.id.connectModeSwitch);
         connectBtn = (Button)findViewById(R.id.connectStateBtn);
         carIpText = (EditText)findViewById(R.id.carIpText);
+        carIpText.setText(readData("carIp"));
+        carIpText.addTextChangedListener(new TextWatcher() {
 
-        carIpText.setText(smartCarIp);
+            public void afterTextChanged(Editable s) {
+                saveData("carIp", s.toString());
+            }
+
+            public void beforeTextChanged(CharSequence s, int start,
+                                          int count, int after) {
+            }
+
+            public void onTextChanged(CharSequence s, int start,
+                                      int before, int count) {
+//                TextView myOutputBox = (TextView) findViewById(R.id.myOutputBox);
+//                myOutputBox.setText(s);
+            }
+        });
+
         connectBtn.setOnClickListener(this);
         connectModeSwitch.setOnCheckedChangeListener(this);
+
 //        carIpText.addTextChangedListener((this);
         ((Button)findViewById(R.id.upBtn)).setOnClickListener(this);
         ((Button)findViewById(R.id.downBtn)).setOnClickListener(this);
         ((Button)findViewById(R.id.leftBtn)).setOnClickListener(this);
         ((Button)findViewById(R.id.rightBtn)).setOnClickListener(this);
 
-
+        ((Button)findViewById(R.id.upLeftBtn)).setOnClickListener(this);
+        ((Button)findViewById(R.id.upRightBtn)).setOnClickListener(this);
+        ((Button)findViewById(R.id.downLeftBtn)).setOnClickListener(this);
+        ((Button)findViewById(R.id.downRightBtn)).setOnClickListener(this);
 
 //        Menu m = navigationView.getMenu();
 //        SubMenu wifiConnectionsMenu = m.addSubMenu("WifiConnections");
@@ -116,10 +143,14 @@ public class MainActivity extends AppCompatActivity
         wifiReciever = new WifiScanReceiver();
         if (wifi.isWifiEnabled() == false)
         {
-            Toast.makeText(getApplicationContext(), "wifi is disabled..making it enabled", Toast.LENGTH_LONG).show();
-            wifi.setWifiEnabled(true);
+            Toast.makeText(getApplicationContext(), "wifi is disabled, you will not be able to connect to the car", Toast.LENGTH_LONG).show();
+//            wifi.setWifiEnabled(true);
         }
-
+        else {
+            startLooking();
+        }
+//        connectToCar();
+        updateUI();
 //        registerReceiver(new BroadcastReceiver()
 //        {
 //            @Override
@@ -138,21 +169,50 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    private void saveData(String key, String val){
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(key, val);
+        editor.commit();
+    }
+
+    private String readData(String key) {
+        String defaultValue = getResources().getString(R.string.default_ip_address);
+        return sharedPref.getString(key, defaultValue);
+    }
+
+    public void startLooking() {
+        //first get the wifi networks list
+        //search for car wifif (ap)
+        // see if have connection data stored
+        // if on same network connect to car
+        //update screen
+    }
+
     private final WebSocketConnection mConnection = new WebSocketConnection();
 
-    private void start() {
+    private void stopTryingToConnect() {
+        if (mConnection != null) {
+            mConnection.disconnect();
+        }
+    }
 
-        final String wsuri = "ws://10.100.102.149:80/index.html?command=true";
+    private void connectToCar() {
+
+        String smartCarIp = carIpText.getText().toString();
+        final String wsuri = "ws://" + smartCarIp + ":80/index.html?command=true";
 //        final String wsuri = "ws://192.168.1.132:9000";
 
-
         try {
+            Log.d(TAG, "Trying to websocket connect to " + wsuri);
             mConnection.connect(wsuri, new WebSocketHandler() {
 
                 @Override
                 public void onOpen() {
                     Log.d(TAG, "Status: Connected to " + wsuri);
                     mConnection.sendTextMessage("Hello, world!");
+                    isConnected = true;
+                    isConnecting = false;
+                    updateUI();
                 }
 
                 @Override
@@ -163,11 +223,19 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 public void onClose(int code, String reason) {
                     Log.d(TAG, "Connection lost.");
+                    Toast.makeText(getApplicationContext(), "Not connected to car", Toast.LENGTH_LONG).show();
+                    isConnecting = false;
+                    isConnected = false;
+                    updateUI();
                 }
             });
         } catch (WebSocketException e) {
 
             Log.d(TAG, e.toString());
+            isConnecting = false;
+            isConnected = false;
+            Toast.makeText(getApplicationContext(), "Could not connect to car", Toast.LENGTH_LONG).show();
+            updateUI();
         }
     }
 
@@ -210,7 +278,7 @@ public class MainActivity extends AppCompatActivity
 //            @Override
 //            public void onError(Exception e) {
 //                isConnected = false;
-//                updateScreenState();
+//                updateUI();
 //                Log.i("Websocket", "Error " + e.getMessage());
 //            }
 //        };
@@ -218,19 +286,32 @@ public class MainActivity extends AppCompatActivity
 //        mWebSocketClient.connect();
 //    }
 
-    private void updateScreenState() {
+    private void updateUI() {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (isConnecting) {
-                    connectBtn.setText("מתחבר!");
-                    connectBtn.setEnabled(true);
-                } else if (isConnected) {
-                    connectBtn.setText("מחובר!");
-                    connectBtn.setEnabled(true);
-                } else {
-                    connectBtn.setText("לא מחובר!");
+                if (!connectModeSwitch.isChecked()) {
+                    connectModeSwitch.setText("מכובה");
                     connectBtn.setEnabled(false);
+                    connectBtn.setText("מנותק!");
+                    connectBtn.setEnabled(false);
+                    if (mConnection != null && mConnection.isConnected()) {
+                        mConnection.disconnect();
+                    }
+                }
+                else {
+                    connectModeSwitch.setText("מאופשר");
+                    connectBtn.setEnabled(true);
+                    if (isConnecting) {
+                        connectBtn.setText("trying to connect!");
+                        connectBtn.setEnabled(true);
+                    } else if (isConnected) {
+                        connectBtn.setText("מחובר!");
+//                        connectBtn.setEnabled(true);
+                    } else {
+                        connectBtn.setText("התחבר");
+//                        connectBtn.setEnabled(false);
+                    }
                 }
             }
         });
@@ -238,6 +319,9 @@ public class MainActivity extends AppCompatActivity
 
 
     private void sendMessage(String msg) {
+        if (mConnection == null || !mConnection.isConnected()) {
+            return;
+        }
         mConnection.sendTextMessage(msg);
 //        mWebSocketClient.send(msg);
     }
@@ -253,7 +337,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     protected void onPause() {
-        unregisterReceiver(wifiReciever);
+        if (wifiReciever != null){
+            unregisterReceiver(wifiReciever);
+        }
         super.onPause();
     }
 
@@ -268,9 +354,10 @@ public class MainActivity extends AppCompatActivity
 //
         registerReceiver(wifiReciever, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
 //
-//        if (wifi.isWifiEnabled()) {
-//            wifi.startScan();
-//        }
+        if (wifi.isWifiEnabled()) {
+            connectModeSwitch.setChecked(true);
+            wifi.startScan();
+        }
         super.onResume();
     }
 
@@ -304,10 +391,10 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_settings) {
             // Handle the camera action
-            Intent intent = new Intent(this, SettingsActivity.class);
-            startActivity(intent);
+            Intent i = new Intent(this, CarSettings.class);
+            startActivity(i);
         } else if (id == R.id.nav_conenctToCar) {
-            start();
+            connectToCar();
 //            connectWebSocket();
 //
 //        } else if (id == R.id.nav_slideshow) {
@@ -327,10 +414,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        if (isChecked) {
-            connectBtn.setEnabled(true);
-
-        }
+        updateUI();
     }
 
     @Override
@@ -341,24 +425,44 @@ public class MainActivity extends AppCompatActivity
                     connectBtn.setText("לא מחובר");
                     isConnecting = false;
                     isConnected = false;
-                } else {
-                    connectBtn.setText("מתחבר!");
-                    start();
-//                    connectWebSocket();
+                }
+                else if (isConnecting) {
+                    stopTryingToConnect();
+                    isConnecting = false;
+                    updateUI();
+                }
+                else {
+//                    connectBtn.setText("מתחבר!");
+                    connectToCar();
+////                    connectWebSocket();
                     isConnecting = true;
+                    updateUI();
                 }
                 break;
+            //Move x%,y%
             case R.id.upBtn:
-                sendMessage("Move forward");
+                sendMessage("Move xy 0,100");
                 break;
             case R.id.downBtn:
-                sendMessage("Move back");
+                sendMessage("Move xy 0,-100");
                 break;
             case R.id.leftBtn:
-                sendMessage("Move left");
+                sendMessage("Move xy -100,0");
                 break;
             case R.id.rightBtn:
-                sendMessage("Move right");
+                sendMessage("Move xy 100,0");
+                break;
+            case R.id.upLeftBtn:
+                sendMessage("Move xy -100,100");
+                break;
+            case R.id.upRightBtn:
+                sendMessage("Move xy 100,100");
+                break;
+            case R.id.downLeftBtn:
+                sendMessage("Move xy -100,-100");
+                break;
+            case R.id.downRightBtn:
+                sendMessage("Move xy 100,-100");
                 break;
             case R.id.stopBtn:
                 sendMessage("Move stop");
@@ -381,22 +485,31 @@ public class MainActivity extends AppCompatActivity
     Log.d(TAG, carIpText.getText().toString());
     }
 
-    private class WifiScanReceiver extends BroadcastReceiver{
+    private class WifiScanReceiver extends BroadcastReceiver {
         public void onReceive(Context c, Intent intent) {
             List<ScanResult> wifiScanList = wifi.getScanResults();
             wifis = new String[wifiScanList.size()];
 
-            for(int i = 0; i < wifiScanList.size(); i++){
+            for (int i = 0; i < wifiScanList.size(); i++) {
 
 //                item = wifiScanList.get(i);
                 wifis[i] = ((wifiScanList.get(i)).toString());
                 Log.d(TAG, "SSID " + wifis[i]);
-//                if (wifis[i].equals(WIFI_SSID)) {
-//                    Log.d(TAG, "SSID " + wifis[i]);
+                if (wifis[i].equals(AP_SSID)) {
+                    Log.d(TAG, "SSID " + wifis[i]);
+                    WifiConfiguration config = new WifiConfiguration();
+                    config.SSID = "\"" + AP_SSID + "\"";
+                    config.preSharedKey = "\"" + "\"";
+                    int netId = wifi.addNetwork(config);
+                    wifi.saveConfiguration();
+                    wifi.disconnect();
+                    wifi.enableNetwork(netId, true);
+                    wifi.reconnect();
 ////                    WifiManager.
 //                }
-            }
+                }
 //            lv.setAdapter(new ArrayAdapter<String>(getApplicationContext(),android.R.layout.simple_list_item_1,wifis));
+            }
         }
     }
 }

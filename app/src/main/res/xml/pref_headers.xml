@@ -3,18 +3,18 @@
     <!-- These settings headers are only used on tablets. -->
 
     <header
-        android:fragment="alon24.smartcarandroid.SettingsActivity$GeneralPreferenceFragment"
+        android:fragment="alon24.smartcarandroid.CarSettings$GeneralPreferenceFragment"
         android:icon="@drawable/ic_info_black_24dp"
         android:title="@string/pref_header_general" />
 
-    <header
-        android:fragment="alon24.smartcarandroid.SettingsActivity$NotificationPreferenceFragment"
-        android:icon="@drawable/ic_notifications_black_24dp"
-        android:title="@string/pref_header_notifications" />
+    <!--<header-->
+        <!--android:fragment="alon24.smartcarandroid.CarSettings$NotificationPreferenceFragment"-->
+        <!--android:icon="@drawable/ic_notifications_black_24dp"-->
+        <!--android:title="@string/pref_header_notifications" />-->
 
     <header
-        android:fragment="alon24.smartcarandroid.SettingsActivity$DataSyncPreferenceFragment"
+        android:fragment="alon24.smartcarandroid.CarSettings$WirelessSettingsPreferenceFragment"
         android:icon="@drawable/ic_sync_black_24dp"
-        android:title="@string/pref_header_data_sync" />
+        android:title="@string/pref_header_wireless" />
 
 </preference-headers>

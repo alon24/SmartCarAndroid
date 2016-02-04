@@ -7,24 +7,7 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:showIn="@layout/activity_main" tools:context=".MainActivity">
-
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="לא מחובר"
-        android:id="@+id/connectStateBtn"
-        android:checked="false"
-        android:enabled="false"
-        android:src="@drawable/checked"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="48dp"
-        android:layout_alignRight="@+id/connectModeSwitch"
-        android:layout_alignEnd="@+id/connectModeSwitch" />
-
+    tools:showIn="@layout/app_bar_main2" tools:context=".MainActivity">
 
     <TextView android:text="המכונית של תום" android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -32,116 +15,153 @@
         android:textSize="30dp"
         android:id="@+id/textView"
         android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
-
-    <TableLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="48dp"
-        android:layout_below="@+id/connectStateBtn"
-        android:layout_centerHorizontal="true"
-        android:stretchColumns="0,1"
-        android:id="@+id/tableLayout">
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="לאט"
-                android:id="@+id/slowBtn"
-                android:layout_column="0" />
-
-            <Button
-                android:layout_height="wrap_content"
-                android:text="למעלה"
-                android:id="@+id/upBtn"
-                android:layout_column="1" />
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="מהר"
-                android:id="@+id/fastBtn"
-                android:layout_column="2" />
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="שמאלה"
-                android:id="@+id/leftBtn"
-                android:layout_column="0" />
-
-            <Button
-                android:layout_height="wrap_content"
-                android:text="עצור"
-                android:id="@+id/stopBtn"
-                android:layout_column="1" />
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="ימינה"
-                android:id="@+id/rightBtn"
-                android:layout_column="2" />
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="2"
-                android:id="@+id/custom2Btn"
-                android:layout_column="0" />
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="למטה"
-                android:id="@+id/downBtn"
-                android:layout_column="1" />
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="1"
-                android:id="@+id/custom1Btn"
-                android:layout_column="2" />
-        </TableRow>
-    </TableLayout>
 
     <Switch
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="התחבר"
+        android:text="מאופשר"
         android:id="@+id/connectModeSwitch"
         android:checked="false"
-        android:layout_alignBottom="@+id/textView"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_below="@id/textView"
+        android:layout_alignParentRight="true"/>
 
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/carIpText"
-        android:text="10.100.102.141"
-        android:layout_alignLeft="@+id/textView"
-        android:layout_alignStart="@+id/textView"
+        android:text="192.168.4.1"
         android:textAlignment="center"
-        android:layout_above="@+id/tableLayout"
-        android:layout_alignRight="@+id/textView"
-        android:layout_alignEnd="@+id/textView"
-        android:layout_alignTop="@+id/connectStateBtn" />
+        android:layout_below="@+id/textView"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_toLeftOf="@+id/connectModeSwitch"
+        android:layout_toStartOf="@+id/connectModeSwitch"
+        android:editable="true"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="התחבר"
+        android:id="@+id/connectStateBtn"
+        android:checked="false"
+        android:enabled="false"
+        android:src="@drawable/checked"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/carIpText"
+        android:layout_alignRight="@+id/textView2"
+        android:layout_alignEnd="@+id/textView2" />
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/Control"
+        android:id="@+id/textView2"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:textAlignment="center"
+        android:layout_below="@+id/connectStateBtn" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/textView2"
+        android:orientation="vertical"
+        android:id="@+id/linearLayout"
+        android:layout_marginTop="20dp">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:layout_weight="1"
+                android:text="מ ק.שמאלה"
+                android:id="@+id/upLeftBtn"
+                android:background="@android:color/holo_purple"
+                />
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:layout_weight="1"
+                android:background="@android:color/holo_blue_light"
+                android:id="@+id/upBtn"
+                android:text="קדימה" />
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:layout_weight="1"
+                android:text="מ ק.ימינה"
+                android:id="@+id/upRightBtn"
+                android:background="@android:color/holo_purple"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:layout_weight="1"
+                android:background="@android:color/holo_blue_light"
+                android:id="@+id/leftBtn"
+                android:text="שמאלה" />
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:layout_weight="1"
+                android:background="@android:color/holo_red_dark"
+                android:id="@+id/stopBtn"
+                android:text="עצור" />
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:layout_weight="1"
+                android:background="@android:color/holo_blue_light"
+                android:id="@+id/rightBtn"
+                android:text="ימינה" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:layout_weight="1"
+                android:text="מ א.שמאלה"
+                android:id="@+id/downRightBtn"
+                android:background="@android:color/holo_purple"/>
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:layout_weight="1"
+                android:id="@+id/downBtn"
+                android:text="אחורה"
+                android:background="@android:color/holo_blue_light"/>
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:layout_weight="1"
+                android:text="מ א.ימינה"
+                android:id="@+id/downLeftBtn"
+                android:background="@android:color/holo_purple"/>
+        </LinearLayout>
+    </LinearLayout>
 
 </RelativeLayout>
