@@ -120,7 +120,7 @@ public class MainActivity extends AppCompatActivity
         ((Button)findViewById(R.id.upRightBtn)).setOnClickListener(this);
         ((Button)findViewById(R.id.downLeftBtn)).setOnClickListener(this);
         ((Button)findViewById(R.id.downRightBtn)).setOnClickListener(this);
-
+        ((Button)findViewById(R.id.stopBtn)).setOnClickListener(this);
 //        Menu m = navigationView.getMenu();
 //        SubMenu wifiConnectionsMenu = m.addSubMenu("WifiConnections");
 //        wifiConnectionsMenu.add("Foo");
@@ -441,33 +441,37 @@ public class MainActivity extends AppCompatActivity
                 break;
             //Move x%,y%
             case R.id.upBtn:
-                sendMessage("Move xy 0,100");
+                sendMoveXYMessage(0,100);
                 break;
             case R.id.downBtn:
-                sendMessage("Move xy 0,-100");
+                sendMoveXYMessage( 0,-100);
                 break;
             case R.id.leftBtn:
-                sendMessage("Move xy -100,0");
+                sendMoveXYMessage(-100,0);
                 break;
             case R.id.rightBtn:
-                sendMessage("Move xy 100,0");
+                sendMoveXYMessage(100,0);
                 break;
             case R.id.upLeftBtn:
-                sendMessage("Move xy -100,100");
+                sendMoveXYMessage( -100,100);
                 break;
             case R.id.upRightBtn:
-                sendMessage("Move xy 100,100");
-                break;
-            case R.id.downLeftBtn:
-                sendMessage("Move xy -100,-100");
+                sendMoveXYMessage(100,100);
                 break;
             case R.id.downRightBtn:
-                sendMessage("Move xy 100,-100");
+                sendMoveXYMessage(-100,-100);
+                break;
+            case R.id.downLeftBtn:
+                sendMoveXYMessage(100,-100);
                 break;
             case R.id.stopBtn:
-                sendMessage("Move stop");
+                sendMoveXYMessage(0,0);
                 break;
         }
+    }
+
+    private void sendMoveXYMessage(int x, int y) {
+        sendMessage("Move xy " + x + " " + y);
     }
 
     @Override
