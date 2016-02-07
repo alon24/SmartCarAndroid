@@ -26,11 +26,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.Toast;
 
 import java.util.List;
 
+import alon24.smartcarandroid.utils.RepeatListener;
 import de.tavendo.autobahn.WebSocketConnection;
 import de.tavendo.autobahn.WebSocketException;
 import de.tavendo.autobahn.WebSocketHandler;
@@ -57,6 +59,9 @@ public class MainActivity extends AppCompatActivity
 
     private boolean isConnected = false;
     private boolean isConnecting = false;
+
+    RepeatListener repeatListener;
+    int curretYPower = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,18 +114,51 @@ public class MainActivity extends AppCompatActivity
 
         connectBtn.setOnClickListener(this);
         connectModeSwitch.setOnCheckedChangeListener(this);
-
+        repeatListener = new RepeatListener(0,100, this);
 //        carIpText.addTextChangedListener((this);
-        ((Button)findViewById(R.id.upBtn)).setOnClickListener(this);
-        ((Button)findViewById(R.id.downBtn)).setOnClickListener(this);
-        ((Button)findViewById(R.id.leftBtn)).setOnClickListener(this);
-        ((Button)findViewById(R.id.rightBtn)).setOnClickListener(this);
+//        ((Button) findViewById(R.id.upBtn)).setOnClickListener(this);
+        ((Button) findViewById(R.id.upBtn)).setOnTouchListener(repeatListener);
 
-        ((Button)findViewById(R.id.upLeftBtn)).setOnClickListener(this);
-        ((Button)findViewById(R.id.upRightBtn)).setOnClickListener(this);
-        ((Button)findViewById(R.id.downLeftBtn)).setOnClickListener(this);
-        ((Button)findViewById(R.id.downRightBtn)).setOnClickListener(this);
-        ((Button)findViewById(R.id.stopBtn)).setOnClickListener(this);
+        ((Button)findViewById(R.id.downBtn)).setOnTouchListener(repeatListener);
+        ((Button)findViewById(R.id.leftBtn)).setOnTouchListener(repeatListener);
+        ((Button)findViewById(R.id.rightBtn)).setOnTouchListener(repeatListener);
+
+        ((Button)findViewById(R.id.upLeftBtn)).setOnTouchListener(repeatListener);
+        ((Button)findViewById(R.id.upRightBtn)).setOnTouchListener(repeatListener);
+        ((Button)findViewById(R.id.downLeftBtn)).setOnTouchListener(repeatListener);
+        ((Button)findViewById(R.id.downRightBtn)).setOnTouchListener(repeatListener);
+        ((Button)findViewById(R.id.stopBtn)).setOnTouchListener(repeatListener);
+        SeekBar seekBar = ((SeekBar)findViewById(R.id.seekBar));
+        seekBar.setMax(100);
+        seekBar.setProgress(curretYPower);
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress,
+                                          boolean fromUser) {
+                curretYPower = progress;
+                Log.d(TAG, "current power = " + curretYPower);
+//                int MIN = 5;
+//                if (progress < MIN) {
+//
+//                    value.setText(" Time Interval (" + seektime + " sec)");
+//                } else {
+//                    seektime = progress;
+//                }
+//                value.setText(" Time Interval (" + seektime + " sec)");
+
+            }
+        });
 //        Menu m = navigationView.getMenu();
 //        SubMenu wifiConnectionsMenu = m.addSubMenu("WifiConnections");
 //        wifiConnectionsMenu.add("Foo");
@@ -441,6 +479,7 @@ public class MainActivity extends AppCompatActivity
                 break;
             //Move x%,y%
             case R.id.upBtn:
+//                Log.d(TAG, "upbtn rpt listener");
                 sendMoveXYMessage(0,100);
                 break;
             case R.id.downBtn:
@@ -471,7 +510,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void sendMoveXYMessage(int x, int y) {
-        sendMessage("Move xy " + x + " " + y);
+        sendMessage("Move xy " + x + " " + curretYPower);
     }
 
     @Override
