@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity
     private boolean isConnecting = false;
 
     RepeatListener repeatListener;
-    int curretYPower = 100;
+    int currentYPower = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity
         ((Button)findViewById(R.id.stopBtn)).setOnTouchListener(repeatListener);
         SeekBar seekBar = ((SeekBar)findViewById(R.id.seekBar));
         seekBar.setMax(100);
-        seekBar.setProgress(curretYPower);
+        seekBar.setProgress(currentYPower);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 
             @Override
@@ -146,8 +146,8 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress,
                                           boolean fromUser) {
-                curretYPower = progress;
-                Log.d(TAG, "current power = " + curretYPower);
+                currentYPower = progress;
+                Log.d(TAG, "current power = " + currentYPower);
 //                int MIN = 5;
 //                if (progress < MIN) {
 //
@@ -504,14 +504,34 @@ public class MainActivity extends AppCompatActivity
                 sendMoveXYMessage(100,-100);
                 break;
             case R.id.stopBtn:
-                sendMoveXYMessage(0,0);
+                sendMoveXYMessage(0, 0);
                 break;
         }
     }
 
     private void sendMoveXYMessage(int x, int y) {
-        sendMessage("Move xy " + x + " " + curretYPower);
+        int tmpY = (x == 0 && y==0) ? 0 : currentYPower;
+        if (y < 0  && tmpY == currentYPower) {
+            tmpY = -tmpY;
+        }
+        sendMessage("Move xy " + x + " " + tmpY);
     }
+
+//    private void sendMoveXYMessage(int x, int y) {
+//        sendMoveXYMessage(x, y, true);
+//    }
+//
+//    private void sendMoveXYMessage(int x, int y, boolean useDefaultPower) {
+//        int tmpY;
+//        if (useDefaultPower) {
+//            tmpY = useDefaultPower ? currentYPower : y;
+//        }
+//
+//        if (y < 0  && useDefaultPower) {
+//            tmpY = -tmpY;
+//        }
+//        sendMessage("Move xy " + x + " " + tmpY);
+//    }
 
     @Override
     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
