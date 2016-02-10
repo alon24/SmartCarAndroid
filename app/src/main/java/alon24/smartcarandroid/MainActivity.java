@@ -238,6 +238,8 @@ public class MainActivity extends AppCompatActivity
 
         String smartCarIp = carIpText.getText().toString();
         final String wsuri = "ws://" + smartCarIp + ":80/index.html?command=true";
+//        final String wsuri = "ws://" + smartCarIp + ":80";
+//
 //        final String wsuri = "ws://192.168.1.132:9000";
 
         try {
@@ -514,7 +516,7 @@ public class MainActivity extends AppCompatActivity
         if (y < 0  && tmpY == currentYPower) {
             tmpY = -tmpY;
         }
-        sendMessage("Move xy " + x + " " + tmpY);
+        sendMessage("Move xyz " + x + " " + tmpY);
     }
 
 //    private void sendMoveXYMessage(int x, int y) {
