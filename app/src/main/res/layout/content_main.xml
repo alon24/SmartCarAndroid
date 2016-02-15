@@ -70,119 +70,128 @@
         <!--android:textAlignment="center"-->
         <!--android:layout_below="@+id/connectStateBtn" />-->
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:id="@+id/linearLayout"
-        android:layout_marginTop="20dp"
-        android:layout_below="@+id/connectStateBtn" >
-        <LinearLayout
+        <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/fragment_container"
+            android:layout_weight="1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_marginTop="20dp"
+            android:layout_below="@+id/connectStateBtn"
+            />
 
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="80dp"
-                android:layout_weight="1"
-                android:text="מ ק.שמאלה"
-                android:id="@+id/upLeftBtn"
-                android:background="@android:color/holo_purple"
-                />
+        <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:orientation="vertical"-->
+        <!--android:id="@+id/linearLayout"-->
+        <!--android:layout_marginTop="20dp"-->
+        <!--android:layout_below="@+id/connectStateBtn" >-->
+        <!--<LinearLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:orientation="horizontal">-->
 
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="80dp"
-                android:layout_weight="1"
-                android:background="@android:color/holo_blue_light"
-                android:id="@+id/upBtn"
-                android:text="קדימה" />
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="80dp"
-                android:layout_weight="1"
-                android:text="מ ק.ימינה"
-                android:id="@+id/upRightBtn"
-                android:background="@android:color/holo_purple"/>
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            <!--<Button-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="80dp"-->
+                <!--android:layout_weight="1"-->
+                <!--android:text="מ ק.שמאלה"-->
+                <!--android:id="@+id/upLeftBtn"-->
+                <!--android:background="@android:color/holo_purple"-->
+                <!--/>-->
 
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="80dp"
-                android:layout_weight="1"
-                android:background="@android:color/holo_blue_light"
-                android:id="@+id/leftBtn"
-                android:text="שמאלה" />
+            <!--<Button-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="80dp"-->
+                <!--android:layout_weight="1"-->
+                <!--android:background="@android:color/holo_blue_light"-->
+                <!--android:id="@+id/upBtn"-->
+                <!--android:text="קדימה" />-->
+            <!--<Button-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="80dp"-->
+                <!--android:layout_weight="1"-->
+                <!--android:text="מ ק.ימינה"-->
+                <!--android:id="@+id/upRightBtn"-->
+                <!--android:background="@android:color/holo_purple"/>-->
+        <!--</LinearLayout>-->
+        <!--<LinearLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:orientation="horizontal">-->
 
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="80dp"
-                android:layout_weight="1"
-                android:background="@android:color/holo_red_dark"
-                android:id="@+id/stopBtn"
-                android:text="עצור" />
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="80dp"
-                android:layout_weight="1"
-                android:background="@android:color/holo_blue_light"
-                android:id="@+id/rightBtn"
-                android:text="ימינה" />
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            <!--<Button-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="80dp"-->
+                <!--android:layout_weight="1"-->
+                <!--android:background="@android:color/holo_blue_light"-->
+                <!--android:id="@+id/leftBtn"-->
+                <!--android:text="שמאלה" />-->
 
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="80dp"
-                android:layout_weight="1"
-                android:text="מ א.שמאלה"
-                android:id="@+id/downRightBtn"
-                android:background="@android:color/holo_purple"/>
+            <!--<Button-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="80dp"-->
+                <!--android:layout_weight="1"-->
+                <!--android:background="@android:color/holo_red_dark"-->
+                <!--android:id="@+id/stopBtn"-->
+                <!--android:text="עצור" />-->
+            <!--<Button-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="80dp"-->
+                <!--android:layout_weight="1"-->
+                <!--android:background="@android:color/holo_blue_light"-->
+                <!--android:id="@+id/rightBtn"-->
+                <!--android:text="ימינה" />-->
+        <!--</LinearLayout>-->
+        <!--<LinearLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:orientation="horizontal">-->
 
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="80dp"
-                android:layout_weight="1"
-                android:id="@+id/downBtn"
-                android:text="אחורה"
-                android:background="@android:color/holo_blue_light"/>
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="80dp"
-                android:layout_weight="1"
-                android:text="מ א.ימינה"
-                android:id="@+id/downLeftBtn"
-                android:background="@android:color/holo_purple"/>
-        </LinearLayout>
-    </LinearLayout>
+            <!--<Button-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="80dp"-->
+                <!--android:layout_weight="1"-->
+                <!--android:text="מ א.שמאלה"-->
+                <!--android:id="@+id/downRightBtn"-->
+                <!--android:background="@android:color/holo_purple"/>-->
 
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/editText"
-        android:layout_below="@+id/linearLayout"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:text="Speed" />
+            <!--<Button-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="80dp"-->
+                <!--android:layout_weight="1"-->
+                <!--android:id="@+id/downBtn"-->
+                <!--android:text="אחורה"-->
+                <!--android:background="@android:color/holo_blue_light"/>-->
+            <!--<Button-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="80dp"-->
+                <!--android:layout_weight="1"-->
+                <!--android:text="מ א.ימינה"-->
+                <!--android:id="@+id/downLeftBtn"-->
+                <!--android:background="@android:color/holo_purple"/>-->
+        <!--</LinearLayout>-->
+    <!--</LinearLayout>-->
 
-    <SeekBar
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/seekBar"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="false"
-        android:thumb="@drawable/thumb_image"
-        android:layout_below="@+id/editText"
-        android:layout_alignRight="@+id/linearLayout"
-        android:layout_alignEnd="@+id/linearLayout" />
+    <!--<EditText-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:id="@+id/editText"-->
+        <!--android:layout_below="@+id/linearLayout"-->
+        <!--android:layout_alignParentLeft="true"-->
+        <!--android:layout_alignParentStart="true"-->
+        <!--android:text="Speed" />-->
+
+    <!--<SeekBar-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:id="@+id/seekBar"-->
+        <!--android:layout_alignParentLeft="true"-->
+        <!--android:layout_alignParentStart="false"-->
+        <!--android:thumb="@drawable/thumb_image"-->
+        <!--android:layout_below="@+id/editText"-->
+        <!--android:layout_alignRight="@+id/linearLayout"-->
+        <!--android:layout_alignEnd="@+id/linearLayout" />-->
 
 
 

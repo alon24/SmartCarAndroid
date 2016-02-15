@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -22,25 +23,27 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.Toast;
 
 import java.util.List;
 
+import alon24.smartcarandroid.utils.CarMoveListener;
 import alon24.smartcarandroid.utils.RepeatListener;
 import de.tavendo.autobahn.WebSocketConnection;
 import de.tavendo.autobahn.WebSocketException;
 import de.tavendo.autobahn.WebSocketHandler;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, CompoundButton.OnCheckedChangeListener, TextWatcher {
+        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, CompoundButton.OnCheckedChangeListener, TextWatcher, CarMoveListener {
 
     private static String TAG = "SmartCar";
+    private String CONTROLLER_TYPE = "conteoller";
 //    private WebSocketClient mWebSocketClient;
     WifiManager wifi;
     String wifis[];
@@ -94,79 +97,146 @@ public class MainActivity extends AppCompatActivity
         connectModeSwitch = (Switch) findViewById(R.id.connectModeSwitch);
         connectBtn = (Button)findViewById(R.id.connectStateBtn);
         carIpText = (EditText)findViewById(R.id.carIpText);
-        carIpText.setText(readData("carIp"));
-        carIpText.addTextChangedListener(new TextWatcher() {
+        carIpText.setText(readData("carIp", getResources().getString(R.string.default_ip_address)));
+                carIpText.addTextChangedListener(new TextWatcher() {
 
-            public void afterTextChanged(Editable s) {
-                saveData("carIp", s.toString());
-            }
+                    public void afterTextChanged(Editable s) {
+                        saveData("carIp", s.toString());
+                    }
 
-            public void beforeTextChanged(CharSequence s, int start,
-                                          int count, int after) {
-            }
+                    public void beforeTextChanged(CharSequence s, int start,
+                                                  int count, int after) {
+                    }
 
-            public void onTextChanged(CharSequence s, int start,
-                                      int before, int count) {
+                    public void onTextChanged(CharSequence s, int start,
+                                              int before, int count) {
 //                TextView myOutputBox = (TextView) findViewById(R.id.myOutputBox);
 //                myOutputBox.setText(s);
-            }
-        });
+                    }
+                });
 
         connectBtn.setOnClickListener(this);
         connectModeSwitch.setOnCheckedChangeListener(this);
-        repeatListener = new RepeatListener(0,100, this);
+
+        Fragment frag = null;
+        String controller = readData(CONTROLLER_TYPE, "9axis");
+        if (controller.equals("9axis")) {
+            frag = new NineAxisController();
+        } else if (controller.equals("joystick")) {
+            frag = new JoystickFragment();
+        }
+        // Create a new Fragment to be placed in the activity layout
+        switchControllerFragment(savedInstanceState, frag);
+
+//        repeatListener = new RepeatListener(0,100, this);
 //        carIpText.addTextChangedListener((this);
 //        ((Button) findViewById(R.id.upBtn)).setOnClickListener(this);
-        ((Button) findViewById(R.id.upBtn)).setOnTouchListener(repeatListener);
-
-        ((Button)findViewById(R.id.downBtn)).setOnTouchListener(repeatListener);
-        ((Button)findViewById(R.id.leftBtn)).setOnTouchListener(repeatListener);
-        ((Button)findViewById(R.id.rightBtn)).setOnTouchListener(repeatListener);
-
-        ((Button)findViewById(R.id.upLeftBtn)).setOnTouchListener(repeatListener);
-        ((Button)findViewById(R.id.upRightBtn)).setOnTouchListener(repeatListener);
-        ((Button)findViewById(R.id.downLeftBtn)).setOnTouchListener(repeatListener);
-        ((Button)findViewById(R.id.downRightBtn)).setOnTouchListener(repeatListener);
-        ((Button)findViewById(R.id.stopBtn)).setOnTouchListener(repeatListener);
-        SeekBar seekBar = ((SeekBar)findViewById(R.id.seekBar));
-        seekBar.setMax(100);
-        seekBar.setProgress(currentYPower);
-        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress,
-                                          boolean fromUser) {
-                currentYPower = progress;
-                Log.d(TAG, "current power = " + currentYPower);
-//                int MIN = 5;
-//                if (progress < MIN) {
+//        ((Button) findViewById(R.id.upBtn)).setOnTouchListener(repeatListener);
 //
-//                    value.setText(" Time Interval (" + seektime + " sec)");
-//                } else {
-//                    seektime = progress;
-//                }
-//                value.setText(" Time Interval (" + seektime + " sec)");
-
+//        ((Button)findViewById(R.id.downBtn)).setOnTouchListener(repeatListener);
+//        ((Button)findViewById(R.id.leftBtn)).setOnTouchListener(repeatListener);
+//        ((Button)findViewById(R.id.rightBtn)).setOnTouchListener(repeatListener);
+//
+//        ((Button)findViewById(R.id.upLeftBtn)).setOnTouchListener(repeatListener);
+//        ((Button)findViewById(R.id.upRightBtn)).setOnTouchListener(repeatListener);
+//        ((Button)findViewById(R.id.downLeftBtn)).setOnTouchListener(repeatListener);
+//        ((Button)findViewById(R.id.downRightBtn)).setOnTouchListener(repeatListener);
+//        ((Button)findViewById(R.id.stopBtn)).setOnTouchListener(repeatListener);
+//        SeekBar seekBar = ((SeekBar)findViewById(R.id.seekBar));
+//        seekBar.setMax(100);
+//        seekBar.setProgress(currentYPower);
+//        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+//
+//            @Override
+//            public void onStopTrackingTouch(SeekBar seekBar) {
+//
+//            }
+//
+//            @Override
+//            public void onStartTrackingTouch(SeekBar seekBar) {
+//
+//            }
+//
+//            @Override
+//            public void onProgressChanged(SeekBar seekBar, int progress,
+//                                          boolean fromUser) {
+//                currentYPower = progress;
+//                Log.d(TAG, "current power = " + currentYPower);
+////                int MIN = 5;
+////                if (progress < MIN) {
+////
+////                    value.setText(" Time Interval (" + seektime + " sec)");
+////                } else {
+////                    seektime = progress;
+////                }
+////                value.setText(" Time Interval (" + seektime + " sec)");
+//
+//            }
+//        });
+        Menu m = navigationView.getMenu();
+        SubMenu controlMenu = m.addSubMenu("Control");
+        controlMenu.add("Joystick").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                JoystickFragment frag = new JoystickFragment();
+                switchControllerFragment(null, frag);
+                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                drawer.closeDrawer(GravityCompat.START);
+                saveData(CONTROLLER_TYPE, "joystick");
+                return true;
             }
         });
-//        Menu m = navigationView.getMenu();
-//        SubMenu wifiConnectionsMenu = m.addSubMenu("WifiConnections");
-//        wifiConnectionsMenu.add("Foo");
-//        wifiConnectionsMenu.add("Bar");
-//        wifiConnectionsMenu.add("Baz");
+        controlMenu.add("9 AXIS").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                NineAxisController frag = new NineAxisController();
+                switchControllerFragment(null, frag);
+                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                drawer.closeDrawer(GravityCompat.START);
+                saveData(CONTROLLER_TYPE, "9axis");
+                return true;
+            }
+        });
+
+        SubMenu address = m.addSubMenu("IPAddress");
+        controlMenu.add("192.168.4.1").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                carIpText.setText("192.168.4.1");
+                if (mConnection != null && mConnection.isConnected()) {
+                    mConnection.disconnect();
+                }
+                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                drawer.closeDrawer(GravityCompat.START);
+                return true;
+            }
+        });
+        controlMenu.add("10.100.102.149").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                carIpText.setText("10.100.102.149");
+                if (mConnection != null && mConnection.isConnected()) {
+                    mConnection.disconnect();
+                }
+                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                drawer.closeDrawer(GravityCompat.START);
+                return true;
+            }
+        });
+//        controlMenu.add("Bar");
+//        controlMenu.add("Baz");
 //
 //        MenuItem mi = m.getItem(m.size()-1);
-//        mi.setTitle("testing123");
+//        mi.setTitle("Joystick");
+//        mi.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+//            @Override
+//            public boolean onMenuItemClick(MenuItem item) {
+//                Intent i = new Intent(MainActivity.this, JoystickActivity.class);
+//                startActivity(i);
+//                return true;
+//            }
+//        });
+
 //        mi.setTitle(mi.getTitle());
 
 //        ConnectivityManager connManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
@@ -207,14 +277,34 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    private void switchControllerFragment(Bundle savedInstanceState, android.support.v4.app.Fragment controllerFrag) {
+        // Check that the activity is using the layout version with
+        // the fragment_container FrameLayout
+        if (findViewById(R.id.fragment_container) != null) {
+
+            // However, if we're being restored from a previous state,
+            // then we don't need to do anything and should return or else
+            // we could end up with overlapping fragments.
+            if (savedInstanceState != null) {
+                return;
+            }
+
+            // In case this activity was started with special instructions from an
+            // Intent, pass the Intent's extras to the fragment as arguments
+            controllerFrag.setArguments(getIntent().getExtras());
+
+//            // Add the fragment to the 'fragment_container' FrameLayout
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, controllerFrag).commit();
+        }
+    }
+
     private void saveData(String key, String val){
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString(key, val);
         editor.commit();
     }
 
-    private String readData(String key) {
-        String defaultValue = getResources().getString(R.string.default_ip_address);
+    private String readData(String key, String defaultValue) {
         return sharedPref.getString(key, defaultValue);
     }
 
@@ -435,8 +525,6 @@ public class MainActivity extends AppCompatActivity
             startActivity(i);
         } else if (id == R.id.nav_conenctToCar) {
             connectToCar();
-//            connectWebSocket();
-//
 //        } else if (id == R.id.nav_slideshow) {
 //
 //        } else if (id == R.id.nav_manage) {
@@ -479,35 +567,6 @@ public class MainActivity extends AppCompatActivity
                     updateUI();
                 }
                 break;
-            //Move x%,y%
-            case R.id.upBtn:
-//                Log.d(TAG, "upbtn rpt listener");
-                sendMoveXYMessage(0,100);
-                break;
-            case R.id.downBtn:
-                sendMoveXYMessage( 0,-100);
-                break;
-            case R.id.leftBtn:
-                sendMoveXYMessage(-100,0);
-                break;
-            case R.id.rightBtn:
-                sendMoveXYMessage(100,0);
-                break;
-            case R.id.upLeftBtn:
-                sendMoveXYMessage( -100,100);
-                break;
-            case R.id.upRightBtn:
-                sendMoveXYMessage(100,100);
-                break;
-            case R.id.downRightBtn:
-                sendMoveXYMessage(-100,-100);
-                break;
-            case R.id.downLeftBtn:
-                sendMoveXYMessage(100,-100);
-                break;
-            case R.id.stopBtn:
-                sendMoveXYMessage(0, 0);
-                break;
         }
     }
 
@@ -516,7 +575,7 @@ public class MainActivity extends AppCompatActivity
         if (y < 0  && tmpY == currentYPower) {
             tmpY = -tmpY;
         }
-        sendMessage("Move xyz " + x + " " + tmpY);
+        sendMessage("Move xy " + x + " " + tmpY);
     }
 
 //    private void sendMoveXYMessage(int x, int y) {
@@ -548,6 +607,12 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void afterTextChanged(Editable s) {
     Log.d(TAG, carIpText.getText().toString());
+    }
+
+    @Override
+    public void onCarChangeDirectionCommand(String cmd) {
+        Log.d(TAG, String.format("sending %s", cmd));
+        sendMessage(cmd);
     }
 
     private class WifiScanReceiver extends BroadcastReceiver {
