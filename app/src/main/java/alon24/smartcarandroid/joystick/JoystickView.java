@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Handler;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -22,11 +23,27 @@ public class JoystickView extends View {
 	private Paint circlePaint;
 	private Paint handlePaint;
 	private double touchX, touchY;
+    private double currentRadius;
 	private int innerPadding;
 	private int handleRadius;
 	private int handleInnerBoundaries;
 	private JoystickMovedListener listener;
 	private int sensitivity;
+
+	private Handler handler = new Handler();
+	private int initialInterval;
+	private final int normalInterval = 100;
+
+	private Runnable handlerRunnable = new Runnable() {
+		@Override
+		public void run() {
+			handler.postDelayed(this, normalInterval);
+            if (listener != null) {
+                listener.OnMoved((int) (touchX / currentRadius * sensitivity), (int) (-touchY  / currentRadius * sensitivity));
+            }
+		}
+	};
+	private View downView;
 
 	// =========================================
 	// Constructors
@@ -54,18 +71,20 @@ public class JoystickView extends View {
 	private void initJoystickView() {
 		setFocusable(true);
 
-		circlePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        circlePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 		circlePaint.setColor(Color.GRAY);
 		circlePaint.setStrokeWidth(1);
 		circlePaint.setStyle(Paint.Style.FILL_AND_STROKE);
 
-		handlePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        handlePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 		handlePaint.setColor(Color.DKGRAY);
 		handlePaint.setStrokeWidth(1);
 		handlePaint.setStyle(Paint.Style.FILL_AND_STROKE);
 
 		innerPadding = 10;
 		sensitivity = 100;
+        currentRadius = 0;
+
 	}
 
 	// =========================================
@@ -128,31 +147,71 @@ public class JoystickView extends View {
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		int actionType = event.getAction();
-		if (actionType == MotionEvent.ACTION_MOVE) {
-			int px = getMeasuredWidth() / 2;
-			int py = getMeasuredHeight() / 2;
-			int radius = Math.min(px, py) - handleInnerBoundaries;
+        switch (actionType) {
+            case MotionEvent.ACTION_DOWN:
 
-			touchX = (event.getX() - px);
-			touchX = Math.max(Math.min(touchX, radius), -radius);
+                handler.removeCallbacks(handlerRunnable);
+                handler.postDelayed(handlerRunnable, initialInterval);
+//                downView = view;
+                setPressed(true);
 
-			touchY = (event.getY() - py);
-			touchY = Math.max(Math.min(touchY, radius), -radius);
+                if (listener != null) {
+                    listener.OnMoved((int) (touchX / currentRadius * sensitivity), (int) (-touchY  / currentRadius * sensitivity));
+                }
 
-			// Coordinates
-//			Log.d(TAG, "X:" + touchX + "|Y:" + touchY);
+//                invalidate();
+                return true;
+            case MotionEvent.ACTION_MOVE:
+                int px = getMeasuredWidth() / 2;
+                int py = getMeasuredHeight() / 2;
+                int radius = Math.min(px, py) - handleInnerBoundaries;
+                currentRadius = radius;
+                touchX = (event.getX() - px);
+                touchX = Math.max(Math.min(touchX, radius), -radius);
 
-			// Pressure
-			if (listener != null) {
-				listener.OnMoved((int) (touchX / radius * sensitivity), (int) (-touchY  / radius * sensitivity));
-			}
+                touchY = (event.getY() - py);
+                touchY = Math.max(Math.min(touchY, radius), -radius);
 
-			invalidate();
-		} else if (actionType == MotionEvent.ACTION_UP) {
-			returnHandleToCenter();
-//			Log.d(TAG, "X:" + touchX + "|Y:" + touchY);
-		}
-		return true;
+                // Coordinates
+			    Log.d(TAG, "X:" + touchX + "|Y:" + touchY);
+                invalidate();
+                break;
+            case MotionEvent.ACTION_CANCEL:
+            case MotionEvent.ACTION_UP:
+                returnHandleToCenter();
+			    Log.d(TAG, "X:" + touchX + "|Y:" + touchY);
+                handler.removeCallbacks(handlerRunnable);
+                setPressed(false);
+//                downView = null;
+                return true;
+        }
+
+        return false;
+//		if (actionType == MotionEvent.ACTION_MOVE) {
+//			int px = getMeasuredWidth() / 2;
+//			int py = getMeasuredHeight() / 2;
+//			int radius = Math.min(px, py) - handleInnerBoundaries;
+//
+//			touchX = (event.getX() - px);
+//			touchX = Math.max(Math.min(touchX, radius), -radius);
+//
+//			touchY = (event.getY() - py);
+//			touchY = Math.max(Math.min(touchY, radius), -radius);
+//
+//			// Coordinates
+////			Log.d(TAG, "X:" + touchX + "|Y:" + touchY);
+//
+//			// Pressure
+//			if (listener != null) {
+//				listener.OnMoved((int) (touchX / radius * sensitivity), (int) (-touchY  / radius * sensitivity));
+//			}
+//
+//			invalidate();
+//		} else if (actionType == MotionEvent.ACTION_UP) {
+//			returnHandleToCenter();
+////			Log.d(TAG, "X:" + touchX + "|Y:" + touchY);
+//		}
+//		return true;
 	}
 
 	private void returnHandleToCenter() {
