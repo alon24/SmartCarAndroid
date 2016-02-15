@@ -33,8 +33,8 @@
 		android:id="@+id/freqSeekeBar"
 		android:layout_marginBottom="16dp"
 		android:layout_marginTop="20dp"
-		android:max="1000"
-		android:progress="250"
+		android:max="200"
+		android:progress="40"
 		android:indeterminate="false" />
 
 	<SeekBar
@@ -44,7 +44,7 @@
 		android:layout_marginBottom="16dp"
 		android:layout_marginTop="20dp"
 		android:max="1023"
-		android:progress="1023"
+		android:progress="500"
 		android:indeterminate="false" />
 
 	<TextView

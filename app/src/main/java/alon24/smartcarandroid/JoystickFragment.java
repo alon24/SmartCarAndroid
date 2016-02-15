@@ -103,7 +103,7 @@ public class JoystickFragment extends Fragment implements SeekBar.OnSeekBarChang
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                freqPwrLab.setText(String.format("Freq is %dMHZ, PWR is %d", freqBar.getProgress(), pwrBar.getProgress()));
+                freqPwrLab.setText(String.format("Freq is %dHz, power is %d", freqBar.getProgress(), pwrBar.getProgress()));
             }
         });
 
