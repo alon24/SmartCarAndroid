@@ -1,4 +1,4 @@
-# ESP8266 SmartCarAndroid
+#SmartCarAndroid
 ------
 
 Android application to control Wifi car using websockets
