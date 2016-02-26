@@ -79,6 +79,12 @@
             android:layout_below="@+id/connectStateBtn"
             />
 
+    <fragment
+        android:id="@+id/details_fragment"
+        class="alon24.smartcarandroid.TuningFragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
         <!--<LinearLayout-->
         <!--android:layout_width="match_parent"-->
         <!--android:layout_height="wrap_content"-->

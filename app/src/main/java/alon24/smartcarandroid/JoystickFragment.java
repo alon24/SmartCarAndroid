@@ -7,8 +7,6 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.SeekBar;
 import android.widget.TextView;
 
 import alon24.smartcarandroid.joystick.JoystickMovedListener;
@@ -18,14 +16,14 @@ import alon24.smartcarandroid.utils.CarMoveListener;
 /**
  * Created by iklein on 13/02/16.
  */
-public class JoystickFragment extends Fragment implements SeekBar.OnSeekBarChangeListener, View.OnClickListener {
+public class JoystickFragment extends Fragment implements View.OnClickListener {
     private String CAR_COMMAND = "Move xyJoystick";
     private String FREQ_COMMAND = "Move freq";
     CarMoveListener mCallback;
     JoystickView joystick;
     TextView txtX, txtY, freqPwrLab;
-    SeekBar freqBar, pwrBar;
-    Button stopBtn;
+//    SeekBar freqBar, pwrBar;
+//    Button stopBtn;
 
     @Override
     public void onAttach(Context activity) {
@@ -51,14 +49,14 @@ public class JoystickFragment extends Fragment implements SeekBar.OnSeekBarChang
 
         joystick.setOnJostickMovedListener(_listener);
 
-        pwrBar = (SeekBar) view.findViewById(R.id.PWRSeekBar);
-        freqBar = (SeekBar) view.findViewById(R.id.freqSeekeBar);
-        freqPwrLab = (TextView) view.findViewById(R.id.freqPwrLab);
-        pwrBar.setOnSeekBarChangeListener(this);
-        freqBar.setOnSeekBarChangeListener(this);
-        stopBtn = (Button) view.findViewById(R.id.stopBtn);
-        stopBtn.setOnClickListener(this);
-        updateUI();
+//        pwrBar = (SeekBar) view.findViewById(R.id.PWRSeekBar);
+//        freqBar = (SeekBar) view.findViewById(R.id.freqSeekeBar);
+//        freqPwrLab = (TextView) view.findViewById(R.id.freqPwrLab);
+//        pwrBar.setOnSeekBarChangeListener(this);
+//        freqBar.setOnSeekBarChangeListener(this);
+//        stopBtn = (Button) view.findViewById(R.id.stopBtn);
+//        stopBtn.setOnClickListener(this);
+//        updateUI();
         return view;
     }
 
@@ -81,33 +79,33 @@ public class JoystickFragment extends Fragment implements SeekBar.OnSeekBarChang
         }
     };
 
-    @Override
-    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-        updateUI();
-        String cmd = String.format("%s 4 %d %d", FREQ_COMMAND, freqBar.getProgress(), pwrBar.getProgress());
-        mCallback.onCarChangeDirectionCommand(cmd);
-
-    }
-
-    @Override
-    public void onStartTrackingTouch(SeekBar seekBar) {
-
-    }
-
-    @Override
-    public void onStopTrackingTouch(SeekBar seekBar) {
-
-    }
-
-    private void updateUI() {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                freqPwrLab.setText(String.format("Freq is %dHz, power is %d", freqBar.getProgress(), pwrBar.getProgress()));
-            }
-        });
-
-    }
+//    @Override
+//    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+//        updateUI();
+//        String cmd = String.format("%s 4 %d %d", FREQ_COMMAND, freqBar.getProgress(), pwrBar.getProgress());
+//        mCallback.onCarChangeDirectionCommand(cmd);
+//
+//    }
+//
+//    @Override
+//    public void onStartTrackingTouch(SeekBar seekBar) {
+//
+//    }
+//
+//    @Override
+//    public void onStopTrackingTouch(SeekBar seekBar) {
+//
+//    }
+//
+//    private void updateUI() {
+//        getActivity().runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                freqPwrLab.setText(String.format("Freq is %dHz, power is %d", freqBar.getProgress(), pwrBar.getProgress()));
+//            }
+//        });
+//
+//    }
 
     @Override
     public void onClick(View v) {

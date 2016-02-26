@@ -214,7 +214,7 @@ public class MainActivity extends AppCompatActivity
         controlMenu.add("10.100.102.149").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                carIpText.setText("10.100.102.149");
+                carIpText.setText("10.100.102.125");
                 if (mConnection != null && mConnection.isConnected()) {
                     mConnection.disconnect();
                 }
@@ -295,6 +295,13 @@ public class MainActivity extends AppCompatActivity
 
 //            // Add the fragment to the 'fragment_container' FrameLayout
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, controllerFrag).commit();
+//            TuningFragment tuningFragment = new TuningFragment();
+//            if (controllerFrag instanceof JoystickFragment) {
+//
+//                getSupportFragmentManager().beginTransaction().replace(R.id.tune_fragment, tuningFragment).commit();
+//            } else {
+//                getSupportFragmentManager().beginTransaction().remove(tuningFragment);
+//            }
         }
     }
 
